@@ -65,10 +65,3 @@ jobs:
         name: allure-results-${{ matrix.browser }}
         path: allure-results/
         retention-days: 30
-    
-    - name: Publish test results
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        files: test-results/**/*.json
-        check_name: Test Results (${{ matrix.browser }})
