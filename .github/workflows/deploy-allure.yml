@@ -1,0 +1,54 @@
+name: Deploy Allure Report
+
+on:
+  workflow_run:
+    workflows: ["Playwright Tests"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install allure-commandline
+      run: npm install -g allure-commandline
+    
+    - name: Merge Allure results
+      run: |
+        mkdir -p merged-results
+        for dir in artifacts/allure-results-*; do
+          if [ -d "$dir" ]; then
+            cp -r "$dir"/* merged-results/ 2>/dev/null || true
+          fi
+        done
+    
+    - name: Generate Allure Report
+      run: |
+        allure generate merged-results -o allure-report --clean
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./allure-report
+        destination_dir: allure
