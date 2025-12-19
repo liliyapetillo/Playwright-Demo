@@ -1,5 +1,8 @@
 # Playwright Contact List Tests
 
+[![Playwright Tests](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml)
+[Allure Report (GitHub Pages)](https://liliyapetillo.github.io/Playwright-Demo/)
+
 Automated tests for a contact list app using Playwright + TypeScript. Features Page Object Model, data persistence, and auto-generated test data.
 
 ## Quick Start
