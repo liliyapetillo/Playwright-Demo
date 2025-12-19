@@ -1,0 +1,21 @@
+{
+  "name": "playwright-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "rm -rf allure-results && playwright test && mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history 2>/dev/null; true && allure generate allure-results -o allure-report --clean && allure open allure-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.2",
+    "allure-playwright": "^3.4.3"
+  },
+  "dependencies": {
+    "playwright": "^1.57.0"
+  }
+}
