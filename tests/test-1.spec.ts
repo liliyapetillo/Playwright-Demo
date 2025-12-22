@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { allure } from 'allure-playwright';
+import * as allure from "allure-js-commons";
 import { generateTimestampedEmail } from './utils/email';
 import { getLastUser, saveUser } from './utils/user';
 import { getLastContact, addContactWithUser } from './utils/contact';

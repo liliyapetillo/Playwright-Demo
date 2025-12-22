@@ -1,7 +1,0 @@
-New contact email: test17829519@testliliyap.com
-test17672918@testliliyap.com
-Added contact: test17829519@testliliyap.com
-New contact email 2: test17875925@testliliyap.com
-test17672918@testliliyap.com
-Added contact: test17875925@testliliyap.com
-Added multiple contacts for user: test17829519@testliliyap.com, test17875925@testliliyap.com
