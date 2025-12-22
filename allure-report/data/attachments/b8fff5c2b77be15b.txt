@@ -1,7 +1,0 @@
-New contact email: test92364037@testliliyap.com
-test92214014@testliliyap.com
-Added contact: test92364037@testliliyap.com
-New contact email 2: test92409424@testliliyap.com
-test92214014@testliliyap.com
-Added contact: test92409424@testliliyap.com
-Added multiple contacts for user: test92364037@testliliyap.com, test92409424@testliliyap.com
