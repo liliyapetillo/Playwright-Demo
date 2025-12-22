@@ -48,23 +48,25 @@ jobs:
           fi
         done
 
-    - name: Download previous Allure report history
+    - name: Download previous Allure history artifact
       uses: dawidd6/action-download-artifact@v3
       with:
         workflow: deploy-allure.yml
-        name: allure-report
-        path: allure-report-history
+        branch: main
+        workflow_conclusion: success
+        name: allure-history
+        path: previous-history
       continue-on-error: true
 
     - name: Merge history into results
       run: |
-        if [ -d "allure-report-history/history" ]; then
+        if [ -d "previous-history" ]; then
           mkdir -p merged-results/history
-          cp -r allure-report-history/history/* merged-results/history/ 2>/dev/null || true
+          cp -r previous-history/* merged-results/history/ 2>/dev/null || true
         fi
 
     - name: Generate Allure Report
-      run: allure generate merged-results -o allure-report
+      run: allure generate merged-results -o allure-report --clean
 
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -74,3 +76,10 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deploy
       uses: actions/deploy-pages@v4
+
+    - name: Upload Allure history artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-history
+        path: allure-report/history
