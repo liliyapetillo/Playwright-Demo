@@ -39,14 +39,16 @@ jobs:
     - name: Install allure-commandline
       run: npm install -g allure-commandline
 
-    - name: Merge Allure results
+    - name: Merge Allure results from all browsers
       run: |
         mkdir -p merged-results
-        for dir in artifacts/*; do
-          if [ -d "$dir" ]; then
-            cp -r "$dir"/* merged-results/ 2>/dev/null || true
-          fi
-        done
+        if [ -d "artifacts" ]; then
+          find artifacts -name "*.json" -type f | while read file; do
+            dir=$(dirname "$file")
+            cp "$file" merged-results/ 2>/dev/null || true
+          done
+        fi
+        ls -la merged-results/ | head -20
 
     - name: Download previous Allure history artifact
       uses: dawidd6/action-download-artifact@v3
@@ -60,13 +62,13 @@ jobs:
 
     - name: Merge history into results
       run: |
-        if [ -d "previous-history" ]; then
+        if [ -d "previous-history/history" ]; then
           mkdir -p merged-results/history
-          cp -r previous-history/* merged-results/history/ 2>/dev/null || true
+          cp -r previous-history/history/* merged-results/history/ 2>/dev/null || true
         fi
 
     - name: Generate Allure Report
-      run: allure generate merged-results -o allure-report --clean
+      run: allure generate merged-results -o allure-report
 
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -77,9 +79,10 @@ jobs:
       id: deploy
       uses: actions/deploy-pages@v4
 
-    - name: Upload Allure history artifact
+    - name: Upload Allure history artifact for next run
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: allure-history
         path: allure-report/history
+        retention-days: 30

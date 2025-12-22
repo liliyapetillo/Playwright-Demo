@@ -36,21 +36,7 @@ jobs:
       env:
         CI: true
     
-    - name: Generate Allure Report
-      if: always()
-      run: |
-        npm install -g allure-commandline
-        allure generate allure-results -o allure-report --clean
-    
-    - name: Upload Allure results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-report-${{ matrix.browser }}
-        path: allure-report/
-        retention-days: 30
-    
-    - name: Upload test results for history
+    - name: Upload Allure results for deployment
       if: always()
       uses: actions/upload-artifact@v4
       with:
