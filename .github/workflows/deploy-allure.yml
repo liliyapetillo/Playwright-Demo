@@ -30,6 +30,8 @@ jobs:
         path: artifacts
         pattern: allure-results-*
         merge-multiple: true
+        github-token: ${{ github.token }}
+        run-id: ${{ github.event.workflow_run.id }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
