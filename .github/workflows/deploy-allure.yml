@@ -77,19 +77,19 @@ jobs:
       run: |
         echo "=== Checking for previous history ==="
         ls -la previous-history/ || echo "No previous-history directory"
-        if [ -d "previous-history/history" ]; then
-          echo "Found history directory"
-          ls -la previous-history/history/ | head -10
+        if [ -d "previous-history" ] && [ "$(ls -A previous-history)" ]; then
+          echo "Found history files"
+          ls -la previous-history/ | head -10
         else
-          echo "No history subdirectory found"
+          echo "No history files found"
         fi
 
     - name: Merge history into results
       run: |
-        if [ -d "previous-history/history" ]; then
+        if [ -d "previous-history" ] && [ "$(ls -A previous-history)" ]; then
           echo "Merging history..."
           mkdir -p merged-results/history
-          cp -r previous-history/history/* merged-results/history/ 2>/dev/null || true
+          cp -r previous-history/* merged-results/history/ 2>/dev/null || true
           echo "History merged successfully"
         else
           echo "No previous history to merge"
