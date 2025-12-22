@@ -62,12 +62,29 @@ jobs:
         path: previous-history
       continue-on-error: true
 
+    - name: Debug - Check downloaded history
+      run: |
+        echo "=== Checking for previous history ==="
+        ls -la previous-history/ || echo "No previous-history directory"
+        if [ -d "previous-history/history" ]; then
+          echo "Found history directory"
+          ls -la previous-history/history/ | head -10
+        else
+          echo "No history subdirectory found"
+        fi
+
     - name: Merge history into results
       run: |
         if [ -d "previous-history/history" ]; then
+          echo "Merging history..."
           mkdir -p merged-results/history
           cp -r previous-history/history/* merged-results/history/ 2>/dev/null || true
+          echo "History merged successfully"
+        else
+          echo "No previous history to merge"
         fi
+        echo "=== Final merged-results/history contents ==="
+        ls -la merged-results/history/ 2>/dev/null || echo "No history directory in merged-results"
 
     - name: Generate Allure Report
       run: allure generate merged-results -o allure-report
