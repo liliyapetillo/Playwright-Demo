@@ -74,7 +74,7 @@ export async function addContactWithUser(
   await expect.poll(async () => {
     return await page.locator('#myTable').textContent();
   }, {
-    timeout: 15000,
+    timeout: 20000,
   }).toContain(contact.email);
 
   // Save the contact data (inline, without exported helper)

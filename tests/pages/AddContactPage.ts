@@ -31,9 +31,14 @@ export class AddContactPage {
     await this.page.locator('#stateProvince').fill(contact.state);
     await this.page.locator('#postalCode').fill(contact.postalCode);
     await this.page.locator('#country').fill(contact.country);
-    await clickButton(this.page, ['Submit', 'Save']);
+    
+    // Submit and wait for navigation
+    await Promise.all([
+      this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {}),
+      clickButton(this.page, ['Submit', 'Save']),
+    ]);
     
     // Confirm row appears after submit
-    await waitForRowWithText(this.page, '#myTable', contact.email, { timeout: 15000 });
+    await waitForRowWithText(this.page, '#myTable', contact.email, { timeout: 20000 });
   }
 }

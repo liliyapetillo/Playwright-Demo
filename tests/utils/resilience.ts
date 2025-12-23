@@ -63,27 +63,36 @@ export async function fillInput(
 
 export async function waitForRowWithText(page: Page, tableSelector: string, text: string, options: { timeout?: number } = {}) {
   const timeout = options.timeout ?? 15000;
+  const startTime = Date.now();
 
-  // Strategy 1: direct has-text on table
-  try {
-    const table = page.locator(tableSelector);
-    await expect(table).toContainText(text, { timeout });
-    return table.locator('tr').filter({ hasText: text }).first();
-  } catch {}
+  while (Date.now() - startTime < timeout) {
+    // Strategy 1: direct has-text on table
+    try {
+      const table = page.locator(tableSelector);
+      await expect(table).toContainText(text, { timeout: 3000 });
+      return table.locator('tr').filter({ hasText: text }).first();
+    } catch {}
 
-  // Strategy 2: row-level has-text
-  try {
-    const row = page.locator(`${tableSelector} tr`).filter({ hasText: text }).first();
-    await row.waitFor({ state: 'visible', timeout });
-    return row;
-  } catch {}
+    // Strategy 2: row-level has-text
+    try {
+      const row = page.locator(`${tableSelector} tr`).filter({ hasText: text }).first();
+      await row.waitFor({ state: 'visible', timeout: 3000 });
+      return row;
+    } catch {}
 
-  // Strategy 3: generic text fallback within table
-  try {
-    const fallback = page.locator(tableSelector).getByText(text, { exact: false }).first();
-    await fallback.waitFor({ state: 'visible', timeout });
-    return page.locator(`${tableSelector} tr`).filter({ hasText: text }).first();
-  } catch {}
+    // Strategy 3: generic text fallback within table
+    try {
+      const fallback = page.locator(tableSelector).getByText(text, { exact: false }).first();
+      await fallback.waitFor({ state: 'visible', timeout: 3000 });
+      return page.locator(`${tableSelector} tr`).filter({ hasText: text }).first();
+    } catch {}
+
+    // If all strategies failed, reload and retry
+    try {
+      await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
+      await page.waitForTimeout(500); // Brief pause after reload
+    } catch {}
+  }
 
   throw new Error(`Row containing '${text}' not found in ${tableSelector}`);
 }

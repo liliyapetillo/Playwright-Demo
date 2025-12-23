@@ -22,6 +22,7 @@ export default defineConfig({
     ["allure-playwright", {
       detail: true,
       outputFolder: 'allure-results',
+      suiteTitle: true,
     }]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -29,7 +30,8 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: 'https://thinking-tester-contact-list.herokuapp.com',
     
-    screenshot: 'only-on-failure', 
+    screenshot: 'only-on-failure',
+    screenshotOnFailure: true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
