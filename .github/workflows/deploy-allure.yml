@@ -5,6 +5,11 @@ on:
     workflows: ["Playwright Tests"]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      resetHistory:
+        description: "Reset Allure history (do not merge previous runs)"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -64,6 +69,7 @@ jobs:
         ls -la merged-results/ | head -20
 
     - name: Download previous Allure history artifact
+      if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
       uses: dawidd6/action-download-artifact@v3
       with:
         workflow: deploy-allure.yml
@@ -85,6 +91,7 @@ jobs:
         fi
 
     - name: Merge history into results
+      if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
       run: |
         if [ -d "previous-history" ] && [ "$(ls -A previous-history)" ]; then
           echo "Merging history..."
