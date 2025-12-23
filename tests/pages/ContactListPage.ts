@@ -17,8 +17,18 @@ export class ContactListPage {
 
   async logoutIfPossible() {
     const logoutButton = this.page.getByRole('button', { name: 'Logout' });
-    if (await logoutButton.isVisible()) {
-      await logoutButton.click();
-    }
+    try {
+      const visible = await logoutButton.isVisible();
+      if (visible) {
+        // Avoid teardown navigation: clear storage and cookies instead
+        await this.page.evaluate(() => {
+          try { localStorage.clear(); } catch {}
+          try { sessionStorage.clear(); } catch {}
+        });
+        try {
+          await this.page.context().clearCookies();
+        } catch {}
+      }
+    } catch {}
   }
 }

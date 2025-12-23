@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { fillInput, clickButton } from '../utils/resilience';
 
 export class SignupPage {
   private page: Page;
@@ -12,10 +13,26 @@ export class SignupPage {
   }
 
   async signUp(firstName: string, lastName: string, email: string, password: string) {
-    await this.page.getByPlaceholder('First Name').fill(firstName);
-    await this.page.getByPlaceholder('Last Name').fill(lastName);
-    await this.page.getByPlaceholder('Email').fill(email);
-    await this.page.getByPlaceholder('Password').fill(password);
-    await this.page.getByRole('button', { name: 'Submit' }).click();
+    await fillInput(this.page, firstName, [
+      { placeholder: 'First Name' },
+      { id: '#firstName' },
+      { label: 'First Name' },
+    ]);
+    await fillInput(this.page, lastName, [
+      { placeholder: 'Last Name' },
+      { id: '#lastName' },
+      { label: 'Last Name' },
+    ]);
+    await fillInput(this.page, email, [
+      { placeholder: 'Email' },
+      { id: '#email' },
+      { label: 'Email' },
+    ]);
+    await fillInput(this.page, password, [
+      { placeholder: 'Password' },
+      { id: '#password' },
+      { label: 'Password' },
+    ]);
+    await clickButton(this.page, ['Submit', 'Sign Up', 'Create Account']);
   }
 }

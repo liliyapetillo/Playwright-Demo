@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { clickButton } from '../utils/resilience';
 
 export class AddContactPage {
   private page: Page;
@@ -19,7 +20,7 @@ export class AddContactPage {
     state: string;
     address: string;
   }) {
-    await this.page.getByRole('button', { name: 'Add a New Contact' }).click();
+    await clickButton(this.page, ['Add a New Contact', 'Add New Contact', 'Add Contact']);
     await this.page.locator('#firstName').fill(contact.firstName);
     await this.page.locator('#lastName').fill(contact.lastName);
     await this.page.locator('#birthdate').fill(contact.dob);

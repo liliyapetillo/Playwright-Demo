@@ -73,7 +73,8 @@ export async function addContactWithUser(
   await page.waitForSelector(`#myTable:has-text("${contact.email}")`);
 
   // Save the contact data (inline, without exported helper)
-  const dataPath = getContactDataPath(testInfo.workerIndex.toString());
+  const contextId = `${testInfo.project.name}-${testInfo.workerIndex}`;
+  const dataPath = getContactDataPath(contextId);
   const payload = { ...contact, createdAt: new Date().toISOString() };
   await ensureDir(dataPath);
   const tmp = `${dataPath}.tmp`;

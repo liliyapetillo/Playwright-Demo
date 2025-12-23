@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
-    "test:report": "rm -rf allure-results && playwright test && mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history 2>/dev/null; true && allure generate allure-results -o allure-report --clean && allure open allure-report"
+    "test:report": "rm -rf allure-results && playwright test && node scripts/allure-categories.js && mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history 2>/dev/null || true && allure generate allure-results -o allure-report --clean && allure open allure-report",
+    "test:report:clean": "rm -rf allure-results allure-report && playwright test && node scripts/allure-categories.js && allure generate allure-results -o allure-report --clean",
+    "test:report:ci": "rm -rf allure-results allure-report && playwright test && node scripts/allure-categories.js && allure generate allure-results -o allure-report --clean"
   },
   "keywords": [],
   "author": "",
