@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Page, APIRequestContext, TestInfo } from '@playwright/test';
+import { Page, APIRequestContext, TestInfo, expect } from '@playwright/test';
 import { TestUser } from './user';
 import { LoginPage } from '../pages/LoginPage';
 import { AddContactPage } from '../pages/AddContactPage';
@@ -70,8 +70,12 @@ export async function addContactWithUser(
     address: contact.address || '',
   });
 
-  // Verify contact was added with robust wait
-  await waitForRowWithText(page, '#myTable', contact.email, { timeout: 15000 });
+  // Verify contact was added using expect.poll() for eventual consistency
+  await expect.poll(async () => {
+    return await page.locator('#myTable').textContent();
+  }, {
+    timeout: 15000,
+  }).toContain(contact.email);
 
   // Save the contact data (inline, without exported helper)
   const contextId = `${testInfo.project.name}-${testInfo.workerIndex}`;
