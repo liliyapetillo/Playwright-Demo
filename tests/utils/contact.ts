@@ -4,6 +4,7 @@ import { Page, APIRequestContext, TestInfo } from '@playwright/test';
 import { TestUser } from './user';
 import { LoginPage } from '../pages/LoginPage';
 import { AddContactPage } from '../pages/AddContactPage';
+import { waitForRowWithText } from './resilience';
 
 export type TestContact = {
   email: string;
@@ -69,8 +70,8 @@ export async function addContactWithUser(
     address: contact.address || '',
   });
 
-  // Verify contact was added
-  await page.waitForSelector(`#myTable:has-text("${contact.email}")`);
+  // Verify contact was added with robust wait
+  await waitForRowWithText(page, '#myTable', contact.email, { timeout: 15000 });
 
   // Save the contact data (inline, without exported helper)
   const contextId = `${testInfo.project.name}-${testInfo.workerIndex}`;
