@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { clickButton, waitForRowWithText } from '../utils/resilience';
+import { clickButton } from '../utils/resilience';
 
 export class AddContactPage {
   private page: Page;
@@ -32,13 +32,11 @@ export class AddContactPage {
     await this.page.locator('#postalCode').fill(contact.postalCode);
     await this.page.locator('#country').fill(contact.country);
     
-    // Submit and wait for navigation
+    // Submit and wait for navigation (if any)
     await Promise.all([
       this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {}),
       clickButton(this.page, ['Submit', 'Save']),
     ]);
-    
-    // Confirm row appears after submit
-    await waitForRowWithText(this.page, '#myTable', contact.email, { timeout: 20000 });
+    // Do not assert the table here; verification is handled by higher-level expect.poll()
   }
 }
