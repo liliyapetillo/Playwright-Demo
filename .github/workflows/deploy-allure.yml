@@ -61,12 +61,11 @@ jobs:
       run: |
         mkdir -p merged-results
         if [ -d "artifacts" ]; then
-          find artifacts -name "*.json" -type f | while read file; do
-            dir=$(dirname "$file")
-            cp "$file" merged-results/ 2>/dev/null || true
-          done
+          echo "Copying all Allure result files (JSON + attachments)"
+          cp -R artifacts/. merged-results/ 2>/dev/null || true
         fi
-        ls -la merged-results/ | head -20
+        echo "Merged results contents:"
+        ls -la merged-results/ | head -40
 
     - name: Download previous Allure history artifact
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
