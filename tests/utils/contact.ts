@@ -1,10 +1,8 @@
-import fs from 'fs';
-import path from 'path';
 import { Page, APIRequestContext, TestInfo, expect } from '@playwright/test';
 import { TestUser } from './user';
 import { LoginPage } from '../pages/LoginPage';
 import { AddContactPage } from '../pages/AddContactPage';
-import { waitForRowWithText } from './resilience';
+import { getTestResultsPath, saveJsonFile, loadJsonFile } from './fileHelpers';
 
 export type TestContact = {
   email: string;
@@ -21,40 +19,23 @@ export type TestContact = {
 };
 
 function getContactDataPath(workerId = 'default'): string {
-  return path.resolve(__dirname, `../../test-results/test-contacts-${workerId}.json`);
-}
-
-async function ensureDir(filePath: string) {
-  const dir = path.dirname(filePath);
-  await fs.promises.mkdir(dir, { recursive: true });
+  return getTestResultsPath('test-contacts', workerId);
 }
 
 export async function getLastContact(workerId?: string): Promise<TestContact | null> {
   const dataPath = getContactDataPath(workerId);
-  try {
-    const raw = await fs.promises.readFile(dataPath, 'utf8');
-    return JSON.parse(raw) as TestContact;
-  } catch (e) {
-    return null;
-  }
+  return loadJsonFile<TestContact>(dataPath);
 }
 
-export async function addContactWithUser(
+/**
+ * Add a contact using the page object (assumes already logged in)
+ */
+export async function addContact(
   page: Page,
-  request: APIRequestContext,
-  user: TestUser,
   contact: Omit<TestContact, 'createdAt'>,
   testInfo: TestInfo
 ): Promise<TestContact> {
-  const loginPage = new LoginPage(page, request);
   const addContactPage = new AddContactPage(page);
-
-  // Navigate to login page and login (automatically redirects to contactList)
-  await page.goto('/');
-  await loginPage.loginWithUser(user);
-
-  // Wait for automatic redirect to contact list
-  await page.waitForURL('**/contactList');
 
   // Add the contact
   await addContactPage.addContact({
@@ -77,18 +58,38 @@ export async function addContactWithUser(
     timeout: 20000,
   }).toContain(contact.email);
 
-  // Save the contact data (inline, without exported helper)
+  // Save the contact data
   const contextId = `${testInfo.project.name}-${testInfo.workerIndex}`;
   const dataPath = getContactDataPath(contextId);
   const payload = { ...contact, createdAt: new Date().toISOString() };
-  await ensureDir(dataPath);
-  const tmp = `${dataPath}.tmp`;
-  await fs.promises.writeFile(tmp, JSON.stringify(payload, null, 2), 'utf8');
-  await fs.promises.rename(tmp, dataPath);
+  await saveJsonFile(dataPath, payload);
 
   console.log(`Added contact: ${contact.email}`);
 
   return { ...contact, createdAt: new Date().toISOString() };
 }
 
-export default { getLastContact, addContactWithUser };
+/**
+ * @deprecated Use addContact() directly with loggedInPage fixture
+ * Legacy helper that performs login before adding contact
+ */
+export async function addContactWithUser(
+  page: Page,
+  request: APIRequestContext,
+  user: TestUser,
+  contact: Omit<TestContact, 'createdAt'>,
+  testInfo: TestInfo
+): Promise<TestContact> {
+  const loginPage = new LoginPage(page, request);
+
+  // Navigate to login page and login (automatically redirects to contactList)
+  await page.goto('/');
+  await loginPage.loginWithUser(user);
+
+  // Wait for automatic redirect to contact list
+  await page.waitForURL('**/contactList');
+
+  return addContact(page, contact, testInfo);
+}
+
+export default { getLastContact, addContact, addContactWithUser };
