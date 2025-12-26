@@ -75,10 +75,14 @@ jobs:
           exit 1
         fi
         echo "Merged results file count: $(ls -1 merged-results/ | wc -l)"
-        echo "Result JSON count: $(find merged-results -name '*-result.json' -type f | wc -l)"
+        RESULT_COUNT=$(find merged-results -name '*-result.json' -type f | wc -l)
+        echo "Result JSON count: $RESULT_COUNT"
         echo "Container JSON count: $(find merged-results -name '*-container.json' -type f | wc -l)"
         echo "Sample of merged-results:"
         ls -la merged-results/ | head -30
+        if [ "$RESULT_COUNT" -eq 0 ]; then
+          echo "WARNING: No test results found in artifacts! Report may be empty."
+        fi
 
     - name: Checkout repository for scripts
       uses: actions/checkout@v4
@@ -90,10 +94,10 @@ jobs:
 
     - name: Filter skipped tests from Allure results
       run: |
-        if [ -f scripts/filter-skipped.js ]; then
+        if [ -f scripts/filter-skipped.js ] && [ -d merged-results ]; then
           node scripts/filter-skipped.js merged-results
         else
-          echo "Warning: filter-skipped.js not found, skipping filter step"
+          echo "Warning: filter-skipped.js or merged-results not found, skipping filter step"
         fi
 
     - name: Add Allure categories
