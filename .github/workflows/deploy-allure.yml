@@ -35,7 +35,7 @@ jobs:
       with:
         path: artifacts
         pattern: allure-results-*
-        merge-multiple: true
+        merge-multiple: false
         github-token: ${{ github.token }}
         run-id: ${{ github.event.workflow_run.id }}
 
@@ -48,6 +48,11 @@ jobs:
         name_is_regexp: true
         name: allure-results-.*
         path: artifacts
+        
+    - name: Debug artifacts structure
+      run: |
+        echo "=== Artifacts directory structure ==="
+        ls -laR artifacts/ || echo "No artifacts directory"
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
