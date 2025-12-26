@@ -65,9 +65,15 @@ jobs:
     - name: Merge Allure results from all browsers
       run: |
         mkdir -p merged-results
+        echo "=== Checking for artifacts directory ==="
+        ls -la || true
         if [ -d "artifacts" ]; then
-          echo "Flattening Allure files (results, containers, attachments, metadata)"
+          echo "=== Artifacts directory contents ==="
+          ls -la artifacts/
+          echo "=== Flattening Allure files (results, containers, attachments, metadata) ==="
           echo "Copying result JSON files..."
+          FOUND_RESULTS=$(find artifacts -type f -name '*-result.json' | wc -l)
+          echo "Found $FOUND_RESULTS result files"
           find artifacts -type f -name '*-result.json' -exec cp {} merged-results/ \;
           echo "Copying container JSON files..."
           find artifacts -type f -name '*-container.json' -exec cp {} merged-results/ \;
@@ -79,11 +85,12 @@ jobs:
           echo "ERROR: artifacts directory does not exist!"
           exit 1
         fi
-        echo "Merged results file count: $(ls -1 merged-results/ | wc -l)"
+        echo "=== Merged results summary ==="
+        echo "Total files: $(ls -1 merged-results/ | wc -l)"
         RESULT_COUNT=$(find merged-results -name '*-result.json' -type f | wc -l)
         echo "Result JSON count: $RESULT_COUNT"
         echo "Container JSON count: $(find merged-results -name '*-container.json' -type f | wc -l)"
-        echo "Sample of merged-results:"
+        echo "=== Sample of merged-results ==="
         ls -la merged-results/ | head -30
         if [ "$RESULT_COUNT" -eq 0 ]; then
           echo "WARNING: No test results found in artifacts! Report may be empty."
