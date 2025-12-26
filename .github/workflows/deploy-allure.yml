@@ -90,7 +90,11 @@ jobs:
 
     - name: Filter skipped tests from Allure results
       run: |
-        node scripts/filter-skipped.js merged-results
+        if [ -f scripts/filter-skipped.js ]; then
+          node scripts/filter-skipped.js merged-results
+        else
+          echo "Warning: filter-skipped.js not found, skipping filter step"
+        fi
 
     - name: Add Allure categories
       run: |

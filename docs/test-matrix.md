@@ -104,7 +104,7 @@
 
 ## Observability & Reporting
 - **TC-OBS-001:** Failure screenshots attached in Allure (P0, High).
-- **TC-OBS-002:** Allure results generated per project (Chromium/Firefox/WebKit) (P1, Medium).
+- **TC-OBS-002:** Allure results generated per project (Chromium/Firefox) (P1, Medium).
 
 ## Mapping to Current Automation
 - **Covers:** [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) contains sign-up, login, add, edit (golden path E2E).
