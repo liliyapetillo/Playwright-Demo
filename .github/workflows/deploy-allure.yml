@@ -99,6 +99,7 @@ jobs:
     - name: Checkout repository for scripts
       uses: actions/checkout@v4
       with:
+        path: repo
         sparse-checkout: |
           scripts/filter-skipped.js
           scripts/allure-categories.js
@@ -106,15 +107,15 @@ jobs:
 
     - name: Filter skipped tests from Allure results
       run: |
-        if [ -f scripts/filter-skipped.js ] && [ -d merged-results ]; then
-          node scripts/filter-skipped.js merged-results
+        if [ -f repo/scripts/filter-skipped.js ] && [ -d merged-results ]; then
+          node repo/scripts/filter-skipped.js merged-results
         else
           echo "Warning: filter-skipped.js or merged-results not found, skipping filter step"
         fi
 
     - name: Add Allure categories
       run: |
-        node scripts/allure-categories.js merged-results
+        node repo/scripts/allure-categories.js merged-results
 
     - name: Download previous Allure history artifact
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
