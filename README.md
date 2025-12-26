@@ -156,7 +156,7 @@ This command:
 
 Run this command **twice** to see trends comparing the two runs.
 
-**Note:** Each test runs on 2 browsers (Chromium, Firefox), so you'll see results grouped by test case with browser breakdowns in the Allure report.
+**Note:** Each test runs on 3 browsers (Chromium, Firefox, WebKit), so you'll see results grouped by test case with browser breakdowns in the Allure report.
 
 ### Allure Categories
 
@@ -177,7 +177,7 @@ This file is generated during `npm run test:report` at `allure-results/categorie
 ## Config
 
 - Base URL: `thinking-tester-contact-list.herokuapp.com`
-- Runs in Chromium and Firefox
+- Runs in Chromium, Firefox, and WebKit
 - Parallel execution enabled
 - Auto-retry: 1 retry locally, 2 retries on CI
 - HTML and Allure reporting enabled

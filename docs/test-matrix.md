@@ -24,14 +24,14 @@
 | --- | --- | --- | --- |
 | TC-AUTH-001 | Signup redirects to Contact List | Done | [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) |
 | TC-AUTH-002 | UI login happy path | Done | [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) |
-| TC-AUTH-003 | Wrong password rejected | Planned | — |
-| TC-AUTH-004 | Unknown email handled | Planned | — |
+| TC-AUTH-003 | Wrong password rejected | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
+| TC-AUTH-004 | Unknown email handled | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
 | TC-AUTH-005 | Token + /users/me authorized | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
 | TC-SEC-003 | Deep-link without auth | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
 | TC-CONTACT-001 | Add contact appears in list | Done | [tests/contacts.spec.ts](tests/contacts.spec.ts) |
 | TC-CONTACT-002 | Edit contact shows changes | Done | [tests/contacts.spec.ts](tests/contacts.spec.ts) |
-| TC-CONTACT-003 | Required fields validated | Planned | — |
-| TC-CONTACT-004 | Duplicate email prevented | Planned | — |
+| TC-CONTACT-003 | Required fields validated | Gap | [tests/api.spec.ts](tests/api.spec.ts) (skipped, API allows missing email) |
+| TC-CONTACT-004 | Duplicate email prevented | Gap | [tests/api.spec.ts](tests/api.spec.ts) (skipped, API allows duplicates) |
 | TC-API-001/002 | Login token + /users/me | Done | [tests/api.spec.ts](tests/api.spec.ts) |
 | TC-A11Y-001/002 | Headings/buttons accessible names | Done | [tests/a11y.spec.ts](tests/a11y.spec.ts) |
 
@@ -94,7 +94,7 @@
 - **TC-REL-001:** Retries recover on transient 5xx (P2, Low).
 
 ## Cross-Browser
-- **TC-CROSS-001:** Core flows pass on Chromium (P0, High), Firefox (P0, High).
+- **TC-CROSS-001:** Core flows pass on Chromium (P0, High) and Firefox (P0, High).
 - **TC-CROSS-002:** Inputs behave consistently across browsers (P1, Medium).
 
 ## Accessibility (A11y)
@@ -104,7 +104,7 @@
 
 ## Observability & Reporting
 - **TC-OBS-001:** Failure screenshots attached in Allure (P0, High).
-- **TC-OBS-002:** Allure results generated per project (Chromium/Firefox) (P1, Medium).
+- **TC-OBS-002:** Allure results generated per project (Chromium/Firefox/WebKit) (P1, Medium).
 
 ## Mapping to Current Automation
 - **Covers:** [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) contains sign-up, login, add, edit (golden path E2E).

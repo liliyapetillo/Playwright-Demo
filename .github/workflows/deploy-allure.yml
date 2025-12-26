@@ -23,13 +23,13 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
-    - name: Download allure-results artifacts
+    - name: Download artifacts from workflow_run event
       if: github.event_name == 'workflow_run'
       uses: actions/download-artifact@v4
       with:
@@ -39,7 +39,7 @@ jobs:
         github-token: ${{ github.token }}
         run-id: ${{ github.event.workflow_run.id }}
 
-    - name: Download latest artifacts (manual trigger)
+    - name: Download artifacts from latest test run (manual trigger)
       if: github.event_name == 'workflow_dispatch'
       uses: dawidd6/action-download-artifact@v3
       with:
@@ -61,11 +61,40 @@ jobs:
       run: |
         mkdir -p merged-results
         if [ -d "artifacts" ]; then
-          echo "Copying all Allure result files (JSON + attachments)"
-          cp -R artifacts/. merged-results/ 2>/dev/null || true
+          echo "Flattening Allure files (results, containers, attachments, metadata)"
+          echo "Copying result JSON files..."
+          find artifacts -type f -name '*-result.json' -exec cp {} merged-results/ \;
+          echo "Copying container JSON files..."
+          find artifacts -type f -name '*-container.json' -exec cp {} merged-results/ \;
+          echo "Copying attachments..."
+          find artifacts -type f -name '*-attachment.*' -exec cp {} merged-results/ \;
+          echo "Copying metadata (environment, categories)..."
+          find artifacts -type f \( -name 'environment.properties' -o -name 'categories.json' \) -exec cp {} merged-results/ \;
+        else
+          echo "ERROR: artifacts directory does not exist!"
+          exit 1
         fi
-        echo "Merged results contents:"
-        ls -la merged-results/ | head -40
+        echo "Merged results file count: $(ls -1 merged-results/ | wc -l)"
+        echo "Result JSON count: $(find merged-results -name '*-result.json' -type f | wc -l)"
+        echo "Container JSON count: $(find merged-results -name '*-container.json' -type f | wc -l)"
+        echo "Sample of merged-results:"
+        ls -la merged-results/ | head -30
+
+    - name: Checkout repository for scripts
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          scripts/filter-skipped.js
+          scripts/allure-categories.js
+        sparse-checkout-cone-mode: false
+
+    - name: Filter skipped tests from Allure results
+      run: |
+        node scripts/filter-skipped.js merged-results
+
+    - name: Add Allure categories
+      run: |
+        node scripts/allure-categories.js merged-results
 
     - name: Download previous Allure history artifact
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
@@ -77,17 +106,6 @@ jobs:
         name: allure-history
         path: previous-history
       continue-on-error: true
-
-    - name: Debug - Check downloaded history
-      run: |
-        echo "=== Checking for previous history ==="
-        ls -la previous-history/ || echo "No previous-history directory"
-        if [ -d "previous-history" ] && [ "$(ls -A previous-history)" ]; then
-          echo "Found history files"
-          ls -la previous-history/ | head -10
-        else
-          echo "No history files found"
-        fi
 
     - name: Merge history into results
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'

@@ -60,7 +60,7 @@ export class LoginPage {
     // Fallback to API login if UI storage/cookie didn’t populate
     const apiLogin = async () => {
       const apiResp = await this.request.post('/users/login', {
-        json: { email: user.email, password: 'password' }
+        data: { email: user.email, password: 'password' }
       });
       if (apiResp.status() !== 200) {
         const failureBody = await apiResp.text();
