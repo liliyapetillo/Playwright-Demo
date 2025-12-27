@@ -15,6 +15,18 @@ export class ContactListPage {
     await this.page.getByRole('button', { name: 'Logout' }).click();
   }
 
+  async logout() {
+    await this.clickLogout();
+  }
+
+  async getPageTitle() {
+    return await this.page.locator('h1, h2').first().textContent();
+  }
+
+  async isContactListVisible() {
+    return await this.page.getByRole('heading', { name: /contact list/i }).isVisible().catch(() => false);
+  }
+
   async logoutIfPossible() {
     const logoutButton = this.page.getByRole('button', { name: 'Logout' });
     try {
