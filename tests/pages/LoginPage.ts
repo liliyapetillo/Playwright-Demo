@@ -99,4 +99,8 @@ export class LoginPage {
     expect(profile.email).toBe(user.email);
     console.log(`Verified user profile for: ${user.email}`);
   }
+
+  async isLoginFormVisible() {
+    return await this.page.getByRole('button', { name: /log in|submit/i }).isVisible().catch(() => false);
+  }
 }

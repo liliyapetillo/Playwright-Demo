@@ -1,66 +1,138 @@
 # Playwright Contact List Tests
 
 [![Playwright Tests](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml)
-[Allure Report (GitHub Pages)](https://liliyapetillo.github.io/Playwright-Demo/)
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-View%20Live-blue)](https://liliyapetillo.github.io/Playwright-Demo/)
 
-Automated tests for a contact list app using Playwright + TypeScript. Features Page Object Model, data persistence, and auto-generated test data.
+Automated test suite for a contact management app using **Playwright**, **TypeScript**, and **CI/CD integration**. Features include Page Object Model, auto-generated test data, dual UI+API validation, and Allure reporting with trends.
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
-npm install
-npx playwright install
-npm test
+npm install && npx playwright install
+npm test                          # Run all tests
+npm run test:report               # Run + generate Allure report with trends
+npx playwright test --headed      # See tests run in browser
 ```
 
-## What's Inside
+**Live Report:** [View Test Results](https://liliyapetillo.github.io/Playwright-Demo/)
+
+## 🧪 Test Coverage (28 cases)
+
+| Suite | Count | Focus |
+|-------|-------|-------|
+| **E2E Smoke** | 4 | Golden path: signup → login → add → edit contact |
+| **Auth** | 4 | Login, tokens, session management |
+| **Contacts** | 2 | Add/edit/list operations |
+| **API** | 3 | REST endpoints, status codes |
+| **Accessibility** | 2 | Labels, headings, keyboard nav |
+| **Other** | 13 | Security, navigation, validation |
+
+## 📁 Key Files
 
 ```
 tests/
-├── pages/              # Page objects (SignupPage, LoginPage, etc.)
-├── utils/              # Helper functions
-│   ├── contactGenerator.ts  # Auto-generates contact data
-│   ├── email.ts            # Unique email generation
-│   ├── user.ts             # User persistence
-│   ├── contact.ts          # Contact persistence + workflow
-│   ├── token.ts            # Auth token storage
-│   ├── testHelpers.ts      # Shared helpers (context, attachments, ensure*)
-│   └── resilience.ts       # Selector fallbacks and robust waits
-├── fixtures.ts         # Playwright fixtures (loggedInPage, testUser)
-├── e2e-smoke.spec.ts   # E2E golden path (signup → login → add → edit)
-├── auth.spec.ts        # Authentication & security tests
-├── contacts.spec.ts    # Contact CRUD operations
-├── api.spec.ts         # API contract tests
-└── a11y.spec.ts        # Accessibility checks
-docs/
-└── test-matrix.md      # Test case mapping & coverage tracking
+├── pages/           # Page Object Model (5 pages)
+├── utils/           # Helpers: data gen, resilience, persistence
+├── fixtures.ts      # Custom fixtures (loggedInPage, testUser)
+├── e2e-smoke.spec.ts, auth.spec.ts, contacts.spec.ts, api.spec.ts, a11y.spec.ts
+└── ...
+docs/test-matrix.md  # Full test case mapping
 ```
 
-## Test Suites
+## ✅ CI/CD: PR Tests → Deploy on Main
 
-**E2E Smoke** (`e2e-smoke.spec.ts`) - Golden path flow
-- Sign up → Login → Add contact → Edit contact (serial execution)
+**Workflow:**
+1. Create/push PR → Playwright Tests auto-run (both browsers)
+2. ✅ Pass? → Merge allowed
+3. ❌ Fail? → PR blocked until fixed
+4. Merge to main → Auto-deploy Allure report
 
-**Auth & Security** (`auth.spec.ts`)
-- TC-AUTH-001: Signup redirects to contact list
-- TC-AUTH-005: API login token + /users/me validation
-- TC-SEC-003: Deep-link without auth renders safely
+**Status checks required on main:**
+- `test (chromium)` ✅
+- `test (firefox)` ✅
 
-**Contacts** (`contacts.spec.ts`)
-- TC-CONTACT-001: Add contact appears in list
-- TC-CONTACT-002: Edit contact shows changes
+## 💡 Key Features
 
-**API** (`api.spec.ts`)
-- TC-API-001/002: Login token + /users/me profile
+- **Auto-generated test data** — Unique timestamps, no hard-coded values
+- **Page Object Model** — Clean, maintainable page abstractions
+- **Dual validation** — UI interactions + API verification
+- **Data persistence** — Users/tokens saved between runs
+- **Resilient selectors** — Smart fallbacks for robust selection
+- **Custom fixtures** — Pre-logged-in pages, test users, reusable setup
+- **Allure reporting** — Rich reports with steps, screenshots, trends
+- **Parallel execution** — 4 workers for speed, cross-browser testing
 
-**Accessibility** (`a11y.spec.ts`)
-- TC-A11Y-001/002: Heading/button accessible names
+## 🛠️ Commands
 
-See [docs/test-matrix.md](docs/test-matrix.md) for full test case mapping and coverage status.
+```bash
+npm test                                  # Default run
+npm run test:report                       # With Allure report
+npx playwright test --headed              # Headed mode
+npx playwright test auth.spec.ts          # Specific file
+npx playwright test --debug               # Debug mode
+npx allure open allure-report             # View report
+```
 
-## Key Features
+## 📊 Allure Reporting
 
-**Auto-generated data** - No more manual test data!
+- Automatic failure categorization (product defects, test defects, flakes, infrastructure)
+- Historical trends across runs
+- Cross-browser comparison
+- Screenshots & attachments from failures
+- Test step timeline
+
+[View Live Dashboard](https://liliyapetillo.github.io/Playwright-Demo/)
+
+## 🔧 Configuration
+
+**playwright.config.ts:**
+- **Browsers:** Chromium, Firefox (desktop)
+- **Base URL:** `thinking-tester-contact-list.herokuapp.com`
+- **Retries:** 0 local, 2 on CI
+- **Workers:** 4 parallel
+- **Timeout:** 30s per test
+
+## 📚 Documentation
+
+- [Test Matrix & Cases](docs/test-matrix.md) — Full coverage mapping
+- [GitHub Actions](https://github.com/liliyapetillo/Playwright-Demo/actions) — Workflow runs
+- [Allure Report](https://liliyapetillo.github.io/Playwright-Demo/) — Live results
+
+## 🚀 Getting Started
+
+1. Clone & install: `git clone ...; npm install; npx playwright install`
+2. Run tests: `npm test`
+3. View report: `npm run test:report`
+4. Create PR → Tests auto-run → Merge when pass ✅
+
+All test data auto-generates with unique timestamps. Clone, install, and run!
+
+## 🛠️ Commands & Development
+
+### Running Tests
+```bash
+npm test                               # Run all tests (default config)
+npm run test:report                    # Run tests + generate Allure report with trends
+npx playwright test --headed           # See browser in action
+npx playwright test --project=chromium # Single browser
+npx playwright test auth.spec.ts       # Specific spec file
+npx playwright test --debug            # Step through in debug mode
+npx playwright show-report             # View HTML report
+```
+
+### Development Workflow
+```bash
+# Write/update test
+npx playwright test tests/mytest.spec.ts --headed --debug
+
+# Generate report locally
+npm run test:report
+
+# View in browser
+npx allure open allure-report
+```
+
+
 ```typescript
 const contact = generateContact(); // Done!
 await addContactWithUser(page, request, lastUser, contact, testInfo);
@@ -121,7 +193,38 @@ await clickButton(page, ['Submit', 'Login', 'Log in']);
 const row = await waitForRowWithText(page, '#myTable', contact.email);
 ```
 
-## Run Commands
+## 📊 Allure Reporting & Test Analysis
+
+### Intelligent Failure Categorization
+Failures are automatically classified to help identify root causes:
+
+- **Product Defects** — Assertion failures (UI mismatch, wrong values)
+- **Test Defects** — Code errors (TypeError, bad selectors, timing issues)
+- **Flaky Tests** — Intermittent timeouts, selector visibility issues
+- **Infrastructure Issues** — Browser launch failures, network errors
+
+**Rules defined in:** [scripts/allure-categories.js](scripts/allure-categories.js)
+
+### Test Trends & Historical Analysis
+Each deployment preserves historical data, showing test health over time:
+- Pass/fail ratios per test
+- Flakiness detection
+- Performance trends
+- Cross-browser comparison
+
+Run tests twice locally to see trends:
+```bash
+npm run test:report   # First run
+npm run test:report   # Second run - compare trends
+```
+
+### Live Dashboard
+**[View Allure Report](https://liliyapetillo.github.io/Playwright-Demo/)**
+- ✅ Pass/fail breakdown by test and browser
+- 📈 Historical trends and patterns
+- 📸 Screenshots and attachments from failures
+- 🔍 Detailed test steps and timelines
+
 
 ```bash
 npm test                               # Run all tests
@@ -134,53 +237,82 @@ npx playwright test --debug            # Debug mode
 npx playwright test tests/contacts.spec.ts --project=chromium  # Run contacts only
 ```
 
-## Allure Reports & Trends
+## 📚 Test Case Mapping
 
-**Quick workflow:**
-```bash
-npx playwright test                                    # Run tests
-npx allure generate allure-results --clean -o allure-report  # Generate report
-npx allure open allure-report                          # Open in browser
+For a complete list of test cases, coverage status, and feature mapping, see [docs/test-matrix.md](docs/test-matrix.md).
+
+Highlights:
+- ✅ **28 test cases** across 5 suites
+- 🔄 **Cross-browser execution** (Chromium, Firefox)
+- 🎯 **Coverage:** E2E flows, auth, CRUD, API contracts, accessibility
+- 📖 [Full Matrix →](docs/test-matrix.md)
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/liliyapetillo/Playwright-Demo.git
+   cd Playwright-Demo
+   ```
+
+2. **Install & setup**
+   ```bash
+   npm install
+   npx playwright install
+   ```
+
+3. **Run tests**
+   ```bash
+   npm test                      # Quick run
+   npm run test:report           # Full report with trends
+   npx allure open allure-report # View in browser
+   ```
+
+4. **View live results**
+   - Pull Request? Tests auto-run. Must pass to merge.
+   - Merged to main? Report auto-deploys → [Live Dashboard](https://liliyapetillo.github.io/Playwright-Demo/)
+
+---
+
+## 💬 Key Takeaways
+
+✅ **Maintainable:** Page Object Model & custom fixtures reduce boilerplate  
+✅ **Reliable:** Resilient selectors, intelligent waits, and auto-retries  
+✅ **Realistic:** Dual UI+API validation catches real-world bugs  
+✅ **Observable:** Rich Allure reports with trends and historical analysis  
+✅ **Scalable:** Parallel execution and data persistence support growth  
+✅ **Professional:** CI/CD gating ensures quality before production  
+
+All test data is **auto-generated** with timestamps for uniqueness. Clone, install, and run!
+
+
+## 🏗️ Configuration
+
+**[playwright.config.ts](playwright.config.ts)**
+```typescript
+{
+  testDir: 'tests',
+  timeout: 30000,          // 30s per test
+  retries: 2,              // 2 retries on CI (0 locally)
+  workers: 4,              // Parallel execution
+  projects: [
+    { name: 'chromium' },
+    { name: 'firefox' },
+  ],
+  reporter: ['allure'],    // Allure reporter
+  baseURL: 'https://thinking-tester-contact-list.herokuapp.com',
+  webServer: null,         // Tests against live server
+}
 ```
 
-**With trends tracking:**
-```bash
-npm run test:report
-```
+**Key Settings:**
+- **Base URL:** Live heroku app (no local server needed)
+- **Parallel Execution:** 4 workers for speed
+- **Auto-Retry:** 2 retries on CI to reduce flakes
+- **Browsers:** Chromium & Firefox (cross-browser validation)
+- **Reporting:** Allure for rich reporting and trends
+- **Timeout:** 30 seconds per test, 10 minutes max per test file
 
-This command:
-1. Clears previous test results
-2. Runs all tests
-3. Preserves history from the previous report
-4. Generates and opens the Allure report with trends
 
-Run this command **twice** to see trends comparing the two runs.
-
-**Note:** Each test runs on 3 browsers (Chromium, Firefox, WebKit), so you'll see results grouped by test case with browser breakdowns in the Allure report.
-
-### Allure Categories
-
-We classify failures automatically using `categories.json`:
-
-- Suite categories: failures grouped by spec file
-	- Suite: Contacts — matches `contacts.spec.ts`
-	- Suite: Auth — matches `auth.spec.ts`
-	- Suite: API — matches `api.spec.ts`
-	- Suite: E2E Smoke — matches `e2e-smoke.spec.ts`
-- Product defects: assertion failures (UI mismatch)
-- Test defects: coding errors (TypeError, bad locator)
-- Flaky tests: timeouts, intermittent selector visibility
-- Infrastructure issues: network errors, browser launch problems
-
-This file is generated during `npm run test:report` at `allure-results/categories.json`. To adjust rules, edit [scripts/allure-categories.js](scripts/allure-categories.js).
-
-## Config
-
-- Base URL: `thinking-tester-contact-list.herokuapp.com`
-- Runs in Chromium, Firefox, and WebKit
-- Parallel execution enabled
-- Auto-retry: 1 retry locally, 2 retries on CI
-- HTML and Allure reporting enabled
-- Allure trends tracking enabled via history preservation
-
-That's it! Clone, install, and run. All test data is auto-generated with timestamps for uniqueness.
