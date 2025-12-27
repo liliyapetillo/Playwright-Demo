@@ -3,254 +3,109 @@
 [![Playwright Tests](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml)
 [![Allure Report](https://img.shields.io/badge/Allure%20Report-View%20Live-blue)](https://liliyapetillo.github.io/Playwright-Demo/)
 
-A comprehensive automated test suite for a contact management application, demonstrating modern test automation practices with **Playwright**, **TypeScript**, and **CI/CD integration**.
-
-## 🎯 Overview
-
-This project showcases enterprise-grade test automation with:
-- **28 test cases** covering E2E, API, authentication, and accessibility
-- **Page Object Model** architecture for maintainability
-- **Intelligent data generation** with auto-persistence
-- **Dual validation** (UI + API) for comprehensive coverage
-- **Cross-browser execution** on Chromium & Firefox
-- **Automated reporting** with Allure and trend analysis
-- **Continuous integration** with GitHub Actions for PRs and main branch deployment
-
-**Live Allure Report:** [View Test Results Dashboard](https://liliyapetillo.github.io/Playwright-Demo/)
-
+Automated test suite for a contact management app using **Playwright**, **TypeScript**, and **CI/CD integration**. Features include Page Object Model, auto-generated test data, dual UI+API validation, and Allure reporting with trends.
 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
-npm install
-npx playwright install
-
-# Run all tests
-npm test
-
-# Generate detailed Allure report with trends
-npm run test:report
-
-# Run tests in headed mode
-npx playwright test --headed
+npm install && npx playwright install
+npm test                          # Run all tests
+npm run test:report               # Run + generate Allure report with trends
+npx playwright test --headed      # See tests run in browser
 ```
 
-## 📁 Project Structure
+**Live Report:** [View Test Results](https://liliyapetillo.github.io/Playwright-Demo/)
+
+## 🧪 Test Coverage (28 cases)
+
+| Suite | Count | Focus |
+|-------|-------|-------|
+| **E2E Smoke** | 4 | Golden path: signup → login → add → edit contact |
+| **Auth** | 4 | Login, tokens, session management |
+| **Contacts** | 2 | Add/edit/list operations |
+| **API** | 3 | REST endpoints, status codes |
+| **Accessibility** | 2 | Labels, headings, keyboard nav |
+| **Other** | 13 | Security, navigation, validation |
+
+## 📁 Key Files
 
 ```
-.
-├── .github/workflows/
-│   ├── playwright.yml         # ✅ Runs on every PR and push to main
-│   └── deploy-allure.yml      # 📊 Auto-deploys report after tests pass
-├── tests/
-│   ├── pages/                 # Page Object Model (5 page classes)
-│   │   ├── SignupPage.ts
-│   │   ├── LoginPage.ts       # Hybrid UI/API auth validation
-│   │   ├── ContactListPage.ts
-│   │   ├── AddContactPage.ts
-│   │   └── EditContactPage.ts
-│   ├── utils/                 # Test utilities & helpers
-│   │   ├── contactGenerator.ts  # Auto-generates realistic test data
-│   │   ├── email.ts            # Unique email factory with timestamps
-│   │   ├── user.ts             # User persistence (localStorage)
-│   │   ├── contact.ts          # Contact CRUD + workflow helpers
-│   │   ├── token.ts            # Auth token storage & retrieval
-│   │   ├── testHelpers.ts      # Shared assertions & setup
-│   │   └── resilience.ts       # Smart selector fallbacks + robust waits
-│   ├── fixtures.ts            # Custom fixtures (loggedInPage, testUser)
-│   ├── e2e-smoke.spec.ts      # 🎯 Golden path: signup → login → add → edit
-│   ├── auth.spec.ts           # 🔐 Authentication & security
-│   ├── contacts.spec.ts       # 📋 Contact CRUD operations
-│   ├── api.spec.ts            # 🔌 API contract validation
-│   └── a11y.spec.ts           # ♿ Accessibility compliance
-├── scripts/
-│   ├── allure-categories.js   # Failure categorization rules
-│   └── filter-skipped.js      # Remove skipped tests from reports
-├── docs/
-│   └── test-matrix.md         # Test case mapping & coverage matrix
-├── playwright.config.ts       # Configuration (browsers, retries, timeouts)
-├── package.json
-└── README.md
+tests/
+├── pages/           # Page Object Model (5 pages)
+├── utils/           # Helpers: data gen, resilience, persistence
+├── fixtures.ts      # Custom fixtures (loggedInPage, testUser)
+├── e2e-smoke.spec.ts, auth.spec.ts, contacts.spec.ts, api.spec.ts, a11y.spec.ts
+└── ...
+docs/test-matrix.md  # Full test case mapping
 ```
 
-## ✅ CI/CD Pipeline: Test on PR, Deploy on Main
+## ✅ CI/CD: PR Tests → Deploy on Main
 
-This project implements a **gating strategy** where tests must pass on pull requests before merging to main.
+**Workflow:**
+1. Create/push PR → Playwright Tests auto-run (both browsers)
+2. ✅ Pass? → Merge allowed
+3. ❌ Fail? → PR blocked until fixed
+4. Merge to main → Auto-deploy Allure report
 
-### Workflow: Pull Request → Main Branch Deployment
+**Status checks required on main:**
+- `test (chromium)` ✅
+- `test (firefox)` ✅
 
-```
-┌─────────────────────┐
-│  Create/Push PR     │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────────────────────┐
-│  GitHub Actions: Playwright Tests   │ ← Runs on: main, develop, PRs
-│  (playwright.yml)                   │
-│  • 2 browsers (Chromium, Firefox)   │
-│  • 28 test cases                    │
-│  • 2 retries on failure             │
-│  • Uploads allure-results artifacts │
-└──────────┬──────────────────────────┘
-           │
-     ✅ PASSED?
-           │
-           ├─────────┬────────────────┐
-           │         │                │
-          YES        NO         (BLOCKED)
-           │         │                │
-           ▼         └───────────────▶ PR blocked until tests pass
-           │
-┌──────────▼──────────────────────────┐
-│  GitHub Actions: Deploy Allure      │ ← Auto-triggered on test pass
-│  (deploy-allure.yml)                │
-│  • Merges cross-browser results     │
-│  • Generates Allure report          │
-│  • Preserves historical trends      │
-│  • Deploys to GitHub Pages          │
-└──────────┬──────────────────────────┘
-           │
-           ▼
-┌──────────────────────────────────────┐
-│  ✅ PR Approved & Merged to main     │
-│  📊 Live Report Available            │
-│  👉 https://liliyapetillo.github.io/ │
-└──────────────────────────────────────┘
-```
+## 💡 Key Features
 
-### Test Execution Strategy
+- **Auto-generated test data** — Unique timestamps, no hard-coded values
+- **Page Object Model** — Clean, maintainable page abstractions
+- **Dual validation** — UI interactions + API verification
+- **Data persistence** — Users/tokens saved between runs
+- **Resilient selectors** — Smart fallbacks for robust selection
+- **Custom fixtures** — Pre-logged-in pages, test users, reusable setup
+- **Allure reporting** — Rich reports with steps, screenshots, trends
+- **Parallel execution** — 4 workers for speed, cross-browser testing
 
-**On Pull Requests:**
-- Tests run automatically on create/push
-- Both Chromium & Firefox browsers execute in parallel (2 matrix jobs)
-- 2 auto-retries reduce flakes
-- Results uploaded as artifacts
-- **Tests must pass to allow merge** (GitHub branch protection configured)
+## 🛠️ Commands
 
-**On Main Branch:**
-- Same test suite runs
-- **If pass:** Auto-deploys Allure report (no manual step needed)
-- **If fail:** Report generated but not deployed; author notified
-
-**Manual Reset Option:**
 ```bash
-# Reset Allure history (start fresh, no trend data)
-gh workflow run deploy-allure.yml -f resetHistory=true
+npm test                                  # Default run
+npm run test:report                       # With Allure report
+npx playwright test --headed              # Headed mode
+npx playwright test auth.spec.ts          # Specific file
+npx playwright test --debug               # Debug mode
+npx allure open allure-report             # View report
 ```
 
-### Test Status Badges
+## 📊 Allure Reporting
 
-- [![Playwright Tests Status](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/liliyapetillo/Playwright-Demo/actions/workflows/playwright.yml) — Latest test run
-- [View Full Test Results →](https://liliyapetillo.github.io/Playwright-Demo/)
+- Automatic failure categorization (product defects, test defects, flakes, infrastructure)
+- Historical trends across runs
+- Cross-browser comparison
+- Screenshots & attachments from failures
+- Test step timeline
 
+[View Live Dashboard](https://liliyapetillo.github.io/Playwright-Demo/)
 
+## 🔧 Configuration
 
-## 🧪 Test Coverage
+**playwright.config.ts:**
+- **Browsers:** Chromium, Firefox (desktop)
+- **Base URL:** `thinking-tester-contact-list.herokuapp.com`
+- **Retries:** 0 local, 2 on CI
+- **Workers:** 4 parallel
+- **Timeout:** 30s per test
 
-### Test Suites & Cases
+## 📚 Documentation
 
-| Suite | Cases | Coverage |
-|-------|-------|----------|
-| **E2E Smoke** | Golden path flow: sign up → login → add contact → edit | Core user workflows |
-| **Auth & Security** | Login tokens, profile validation, unauthorized access | Authentication & security |
-| **Contacts CRUD** | Add, edit, list operations | Feature functionality |
-| **API** | Login, profile endpoints, status codes | Backend contracts |
-| **Accessibility (A11y)** | Headings, form labels, button names, keyboard nav | Compliance |
+- [Test Matrix & Cases](docs/test-matrix.md) — Full coverage mapping
+- [GitHub Actions](https://github.com/liliyapetillo/Playwright-Demo/actions) — Workflow runs
+- [Allure Report](https://liliyapetillo.github.io/Playwright-Demo/) — Live results
 
-**Details:**
+## 🚀 Getting Started
 
-**E2E Smoke** (`e2e-smoke.spec.ts`)
-- Sign up → Login → Add contact → Edit contact (serial execution)
+1. Clone & install: `git clone ...; npm install; npx playwright install`
+2. Run tests: `npm test`
+3. View report: `npm run test:report`
+4. Create PR → Tests auto-run → Merge when pass ✅
 
-**Auth & Security** (`auth.spec.ts`)
-- TC-AUTH-001: Signup redirects to contact list
-- TC-AUTH-005: API login token + /users/me validation
-- TC-SEC-003: Deep-link without auth renders safely
-
-**Contacts** (`contacts.spec.ts`)
-- TC-CONTACT-001: Add contact appears in list
-- TC-CONTACT-002: Edit contact shows changes
-
-**API** (`api.spec.ts`)
-- TC-API-001/002: Login token + /users/me profile
-
-**Accessibility** (`a11y.spec.ts`)
-- TC-A11Y-001/002: Heading/button accessible names
-
-See [docs/test-matrix.md](docs/test-matrix.md) for full test case mapping and coverage status.
-
-## 💡 Design Patterns & Best Practices
-
-### 1. Page Object Model (POM)
-Encapsulates UI interactions and locators in dedicated page classes. This improves maintainability and readability.
-
-```typescript
-// Clean, reusable page abstractions
-const signupPage = new SignupPage(page);
-await signupPage.fillEmail('test@example.com');
-await signupPage.submitForm();
-```
-
-### 2. Intelligent Auto-generated Test Data
-No hard-coded test data. Every test uses dynamically generated, unique test data with timestamps to avoid conflicts.
-
-```typescript
-// Auto-generates: { firstName, lastName, email, phone, dob, street, city, state, zip }
-const contact = generateContact(); 
-
-// Override specific fields if needed
-const contact = generateContact({ firstName: 'John', lastName: 'Doe' });
-```
-
-### 3. Dual Validation: UI + API
-Tests validate both the user interface and backend state. This catches bugs that UI-only or API-only tests might miss.
-
-```typescript
-// Add contact via UI, verify via API
-const contact = generateContact();
-await addContactPage.addContact(contact);
-
-// Verify backend has the data
-const apiResponse = await request.get(`/contacts/${contact.email}`);
-expect(apiResponse.status()).toBe(200);
-expect(await apiResponse.json()).toMatchObject(contact);
-```
-
-### 4. Data Persistence Across Tests
-Test data (users, contacts, tokens) is persisted in `test-results/` between runs, enabling realistic workflows without redundant setup.
-
-### 5. Resilient Selectors with Fallbacks
-Smart selector selection reduces flakes. Inputs/buttons try multiple strategies (placeholder → ID → label/name).
-
-```typescript
-// Handles various DOM structures without explicit selector tuning
-await fillInput(page, 'test@example.com', [
-  { placeholder: 'Email' },
-  { id: 'email' },
-  { label: 'Email Address' }
-]);
-```
-
-### 6. Robust Wait Strategies
-Stabilizes assertions against eventual consistency and render delays.
-
-```typescript
-// Waits for exact row match, handles async table updates
-const row = await waitForRowWithText(page, '#contactsTable', 'john@example.com');
-```
-
-### 7. Custom Fixtures for DRY Tests
-Playwright fixtures eliminate repetitive setup (login, user creation) across specs.
-
-```typescript
-test('user can add contact', async ({ loggedInPage, testUser }) => {
-  // loggedInPage is pre-authenticated, testUser already exists
-  // No redundant login code needed
-});
-```
-
+All test data auto-generates with unique timestamps. Clone, install, and run!
 
 ## 🛠️ Commands & Development
 
