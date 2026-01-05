@@ -1,4 +1,5 @@
 name: Playwright Tests
+# E2E Smoke Tests are required for PR merge, Other Tests are optional
 
 on:
   push:
