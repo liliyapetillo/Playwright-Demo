@@ -1,4 +1,5 @@
 name: Playwright Tests
+# E2E Smoke Tests are required for PR merge, Other Tests are optional
 
 on:
   push:
@@ -8,7 +9,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  e2e-smoke:
+    name: E2E Smoke Tests
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker test image
+      run: docker build -t playwright-test-image .
+    
+    - name: Run E2E smoke tests in Docker
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 2
+        retry_wait_seconds: 20
+        timeout_minutes: 10
+        command: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/tests/allure-results \
+            -e CI=true \
+            -e BROWSER=${{ matrix.browser }} \
+            playwright-test-image npx playwright test tests/e2e-smoke.spec.ts --project=${{ matrix.browser }}
+    
+    - name: Upload Allure results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-results-smoke-${{ matrix.browser }}
+        path: allure-results/
+        retention-days: 30
+
+  other-tests:
+    name: Other Tests (excluding E2E Smoke)
     timeout-minutes: 60
     runs-on: ubuntu-latest
     
@@ -20,32 +59,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+    - name: Build Docker test image
+      run: docker build -t playwright-test-image .
     
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
-    
-    - name: Run tests (auto-retry on failure)
+    - name: Run other tests in Docker (auto-retry on failure)
       uses: nick-fields/retry@v3
       with:
         max_attempts: 2
         retry_wait_seconds: 20
         timeout_minutes: 10
-        command: npx playwright test --project=${{ matrix.browser }}
-      env:
-        CI: true
+        command: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/tests/allure-results \
+            -e CI=true \
+            -e BROWSER=${{ matrix.browser }} \
+            playwright-test-image npx playwright test tests/auth.spec.ts tests/contacts.spec.ts tests/api.spec.ts tests/a11y.spec.ts tests/logout.spec.ts --project=${{ matrix.browser }}
     
-    - name: Upload Allure results for deployment
+    - name: Upload Allure results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: allure-results-${{ matrix.browser }}
+        name: allure-results-other-${{ matrix.browser }}
         path: allure-results/
         retention-days: 30
