@@ -31,7 +31,7 @@ jobs:
     steps:
     - name: Download artifacts from workflow_run event
       if: github.event_name == 'workflow_run'
-      uses: actions/download-artifact@v8
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
         pattern: allure-results-*
@@ -41,23 +41,23 @@ jobs:
 
     - name: Download artifacts from latest test run (manual trigger)
       if: github.event_name == 'workflow_dispatch'
-      uses: dawidd6/action-download-artifact@v23
+      uses: dawidd6/action-download-artifact@v3
       with:
         workflow: playwright.yml
         workflow_conclusion: success
         name_is_regexp: true
         name: allure-results-.*
         path: artifacts
-
+        
     - name: Debug artifacts structure
       run: |
         echo "=== Artifacts directory structure ==="
         ls -laR artifacts/ || echo "No artifacts directory"
 
     - name: Set up Node.js
-      uses: actions/setup-node@v7
+      uses: actions/setup-node@v4
       with:
-        node-version: 'lts/*'
+        node-version: '20'
 
     - name: Install allure-commandline
       run: npm install -g allure-commandline
@@ -97,7 +97,7 @@ jobs:
         fi
 
     - name: Checkout repository for scripts
-      uses: actions/checkout@v7
+      uses: actions/checkout@v4
       with:
         path: repo
         sparse-checkout: |
@@ -117,16 +117,16 @@ jobs:
       run: |
         node repo/scripts/allure-categories.js merged-results
 
-    - name: Fetch previous Allure history from live Pages site
-      # Pages content persists indefinitely (until the next deploy overwrites it), unlike
-      # a 30-day-retention Actions artifact, so trends survive any gap between CI runs.
+    - name: Download previous Allure history artifact
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
-      run: |
-        mkdir -p previous-history
-        base_url="https://liliyapetillo.github.io/Playwright-Demo/history"
-        for f in history.json history-trend.json duration-trend.json categories-trend.json retry-trend.json; do
-          curl -sf "$base_url/$f" -o "previous-history/$f" || echo "No $f on live site yet (first deploy or reset)"
-        done
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        workflow: deploy-allure.yml
+        branch: main
+        workflow_conclusion: success
+        name: allure-history
+        path: previous-history
+      continue-on-error: true
 
     - name: Merge history into results
       if: github.event_name != 'workflow_dispatch' || github.event.inputs.resetHistory != 'true'
@@ -146,10 +146,18 @@ jobs:
       run: allure generate merged-results -o allure-report
 
     - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v5
+      uses: actions/upload-pages-artifact@v3
       with:
         path: ./allure-report
 
     - name: Deploy to GitHub Pages
       id: deploy
-      uses: actions/deploy-pages@v5
+      uses: actions/deploy-pages@v4
+
+    - name: Upload Allure history artifact for next run
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-history
+        path: allure-report/history
+        retention-days: 30

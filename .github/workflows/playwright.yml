@@ -20,7 +20,7 @@ jobs:
         browser: [chromium, firefox]
     
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v4
     
     - name: Build Docker test image
       run: docker build -t playwright-test-image .
@@ -40,7 +40,7 @@ jobs:
     
     - name: Upload Allure results
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v4
       with:
         name: allure-results-smoke-${{ matrix.browser }}
         path: allure-results/
@@ -57,7 +57,7 @@ jobs:
         browser: [chromium, firefox]
     
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v4
     
     - name: Build Docker test image
       run: docker build -t playwright-test-image .
@@ -77,7 +77,7 @@ jobs:
     
     - name: Upload Allure results
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@v4
       with:
         name: allure-results-other-${{ matrix.browser }}
         path: allure-results/
