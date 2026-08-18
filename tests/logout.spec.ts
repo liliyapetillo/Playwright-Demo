@@ -1,21 +1,45 @@
 import { test, expect } from './fixtures';
+import { ContactListPage } from './pages/ContactListPage';
+import { attachOnFailure } from './utils/testHelpers';
 
-test.describe('Session Management & Auth', () => {
-  test('[TC-AUTH-007] Unauthorized request without token', async ({ request }) => {
-    const resp = await request.get('/contacts', {
-      headers: { 'Authorization': 'Bearer invalid-token' }
+test.afterEach(async ({ page }, testInfo) => {
+  await attachOnFailure(page, testInfo);
+});
+
+// [TC-AUTH-006] Logout clears session storage and returns to login page
+test('[TC-AUTH-006] Logout clears session and returns to login page', async ({ loggedInPage }) => {
+  const page = loggedInPage;
+  const contactList = new ContactListPage(page);
+
+  await test.step('Log out via UI', async () => {
+    await contactList.logout();
+  });
+
+  await test.step('Verify redirected away from contact list', async () => {
+    await page.waitForURL((url) => !url.pathname.includes('contactList'));
+  });
+
+  await test.step('Verify session storage cleared', async () => {
+    const token = await page.evaluate(() => {
+      try {
+        return (
+          localStorage.getItem('token') ||
+          localStorage.getItem('authToken') ||
+          sessionStorage.getItem('token') ||
+          sessionStorage.getItem('authToken')
+        );
+      } catch {
+        return null;
+      }
     });
-    expect(resp.status()).toBe(401);
+    expect(token).toBeFalsy();
   });
+});
 
-  test('[TC-AUTH-006] Profile endpoint protected by auth', async ({ request }) => {
-    const resp = await request.get('/users/me');
-    expect(resp.status()).toBe(401);
+// [TC-AUTH-007] Unauthorized API request without a valid token is rejected
+test('[TC-AUTH-007] Unauthorized request without token', async ({ request }) => {
+  const resp = await request.get('/contacts', {
+    headers: { 'Authorization': 'Bearer invalid-token' }
   });
-
-  test('[TC-NAV-001] Contacts endpoint requires valid token', async ({ request }) => {
-    // No auth = 401
-    const noAuth = await request.get('/contacts');
-    expect(noAuth.status()).toBe(401);
-  });
+  expect(resp.status()).toBe(401);
 });

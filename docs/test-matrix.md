@@ -9,6 +9,8 @@
 - TC-AUTH-001 • Signup redirect • Automated in [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts)
 - TC-AUTH-002 • UI login happy path • Automated in [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts)
 - TC-AUTH-005 • Token + /users/me • Automated in [tests/auth.spec.ts](tests/auth.spec.ts)
+- TC-AUTH-006 • Logout clears session • Automated in [tests/logout.spec.ts](tests/logout.spec.ts)
+- TC-AUTH-007 • Invalid token rejected • Automated in [tests/logout.spec.ts](tests/logout.spec.ts)
 - TC-SEC-003 • Deep-link without auth • Automated in [tests/auth.spec.ts](tests/auth.spec.ts)
 - TC-CONTACT-001 • Add contact in list • Automated in [tests/contacts.spec.ts](tests/contacts.spec.ts)
 - TC-CONTACT-002 • Edit contact shows changes • Automated in [tests/contacts.spec.ts](tests/contacts.spec.ts)
@@ -24,9 +26,11 @@
 | --- | --- | --- | --- |
 | TC-AUTH-001 | Signup redirects to Contact List | Done | [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) |
 | TC-AUTH-002 | UI login happy path | Done | [tests/e2e-smoke.spec.ts](tests/e2e-smoke.spec.ts) |
-| TC-AUTH-003 | Wrong password rejected | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
-| TC-AUTH-004 | Unknown email handled | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
+| TC-AUTH-003 | Wrong password rejected | Gap | Not automated |
+| TC-AUTH-004 | Unknown email handled | Gap | Not automated |
 | TC-AUTH-005 | Token + /users/me authorized | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
+| TC-AUTH-006 | Logout clears session, returns to login | Done | [tests/logout.spec.ts](tests/logout.spec.ts) |
+| TC-AUTH-007 | Invalid token rejected by API | Done | [tests/logout.spec.ts](tests/logout.spec.ts) |
 | TC-SEC-003 | Deep-link without auth | Done | [tests/auth.spec.ts](tests/auth.spec.ts) |
 | TC-CONTACT-001 | Add contact appears in list | Done | [tests/contacts.spec.ts](tests/contacts.spec.ts) |
 | TC-CONTACT-002 | Edit contact shows changes | Done | [tests/contacts.spec.ts](tests/contacts.spec.ts) |
@@ -112,11 +116,10 @@
 - **Pages:** [tests/pages/SignupPage.ts](tests/pages/SignupPage.ts), [tests/pages/LoginPage.ts](tests/pages/LoginPage.ts), [tests/pages/AddContactPage.ts](tests/pages/AddContactPage.ts), [tests/pages/ContactListPage.ts](tests/pages/ContactListPage.ts).
 
 ## Automation Backlog Suggestions
-- **New specs:**
-  - `auth.spec.ts` for negative auth (TC-AUTH-003/004/007, TC-SEC-003).
-  - `contacts.spec.ts` for validations and duplicate checks (TC-CONTACT-003/004/005/008).
-  - `api.spec.ts` for direct API contract checks (TC-API-001..005).
-  - `a11y.spec.ts` with axe checks for headings/labels (TC-A11Y-001..003).
+- **Remaining gaps:**
+  - `auth.spec.ts` negative-auth cases (TC-AUTH-003/004: wrong password, unknown email).
+  - `contacts.spec.ts` validations and duplicate checks (TC-CONTACT-003/004/005/008).
+  - `a11y.spec.ts` keyboard navigation (TC-A11Y-003) — consider adding `@axe-core/playwright`.
 - **Infra:** Add Playwright fixtures for token/session, reusable API client.
 - **Reporting:** Ensure Allure attaches per-project and include traces on retry.
 

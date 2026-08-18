@@ -26,16 +26,16 @@ npm test
 
 ## Test Coverage
 
-28 test cases across 5 suites:
+21 test cases across 6 suites:
 
 | Suite | Count | Scope |
 |-------|-------|-------|
-| E2E Smoke | 4 | Signup → login → add → edit contact |
-| Auth | 4 | Login, tokens, session management |
+| E2E Smoke | 5 | Signup → login → add → edit contact |
+| Auth | 3 | Signup redirect, token validation, deep-link security |
+| Logout | 2 | Session teardown, invalid-token rejection |
 | Contacts | 2 | CRUD operations |
-| API | 3 | REST endpoints, status validation |
-| Accessibility | 2 | ARIA labels, keyboard navigation |
-| Other | 13 | Security, validation, edge cases |
+| API | 2 | REST endpoints, status validation |
+| Accessibility | 2 | ARIA labels, form labeling |
 
 Full matrix: [docs/test-matrix.md](docs/test-matrix.md)
 
